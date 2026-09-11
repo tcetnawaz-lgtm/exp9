@@ -1,6 +1,14 @@
 pipeline {
     agent any
     
+    // --- THIS BLOCK IS THE FIX ---
+    // It temporarily adds Docker to Jenkins' PATH and connects to the port we just opened
+    environment {
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+        DOCKER_HOST = "tcp://localhost:2375"
+    }
+    // -----------------------------
+    
     stages {
         stage('Setup & Train Model') {
             steps {
@@ -22,7 +30,6 @@ pipeline {
         
         stage('Deploy API (Docker Run)') {
             steps {
-                // Remove old container if it exists, run new one detached (-d)
                 bat '''
                 docker rm -f network-api-container || exit 0
                 docker run -d -p 8000:8000 --name network-api-container network-mlops-api:latest
