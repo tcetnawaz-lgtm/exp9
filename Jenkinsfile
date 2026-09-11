@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        // Keep this so Jenkins has permission to talk to the Docker daemon
+        // Keeps the network connection open for Jenkins to talk to Docker Desktop
         DOCKER_HOST = "tcp://localhost:2375"
     }
     
@@ -21,15 +21,15 @@ pipeline {
         
         stage('Package Model (Docker Build)') {
             steps {
-                bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" build -t network-mlops-api:latest .'
+                bat '"C:\\Users\\TCET\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t network-mlops-api:latest .'
             }
         }
         
         stage('Deploy API (Docker Run)') {
             steps {
                 bat '''
-                "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" rm -f network-api-container || exit 0
-                "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" run -d -p 8000:8000 --name network-api-container network-mlops-api:latest
+                "C:\\Users\\TCET\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" rm -f network-api-container || exit 0
+                "C:\\Users\\TCET\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" run -d -p 8000:8000 --name network-api-container network-mlops-api:latest
                 '''
             }
         }
@@ -47,8 +47,8 @@ pipeline {
     post {
         cleanup {
             echo "Tearing down deployment and cleaning workspace..."
-            bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" stop network-api-container || exit 0'
-            bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" rm network-api-container || exit 0'
+            bat '"C:\\Users\\TCET\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" stop network-api-container || exit 0'
+            bat '"C:\\Users\\TCET\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" rm network-api-container || exit 0'
             cleanWs()
         }
     }
