@@ -1,13 +1,10 @@
 pipeline {
     agent any
     
-    // --- THIS BLOCK IS THE FIX ---
-    // It temporarily adds Docker to Jenkins' PATH and connects to the port we just opened
     environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+        // Keep this so Jenkins has permission to talk to the Docker daemon
         DOCKER_HOST = "tcp://localhost:2375"
     }
-    // -----------------------------
     
     stages {
         stage('Setup & Train Model') {
@@ -24,15 +21,15 @@ pipeline {
         
         stage('Package Model (Docker Build)') {
             steps {
-                bat 'docker build -t network-mlops-api:latest .'
+                bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" build -t network-mlops-api:latest .'
             }
         }
         
         stage('Deploy API (Docker Run)') {
             steps {
                 bat '''
-                docker rm -f network-api-container || exit 0
-                docker run -d -p 8000:8000 --name network-api-container network-mlops-api:latest
+                "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" rm -f network-api-container || exit 0
+                "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" run -d -p 8000:8000 --name network-api-container network-mlops-api:latest
                 '''
             }
         }
@@ -50,8 +47,8 @@ pipeline {
     post {
         cleanup {
             echo "Tearing down deployment and cleaning workspace..."
-            bat 'docker stop network-api-container || exit 0'
-            bat 'docker rm network-api-container || exit 0'
+            bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" stop network-api-container || exit 0'
+            bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" rm network-api-container || exit 0'
             cleanWs()
         }
     }
